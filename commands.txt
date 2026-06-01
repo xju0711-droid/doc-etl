@@ -1,0 +1,132 @@
+=====================================================
+  LLM 文档 ETL 工具 — 常用命令速查
+=====================================================
+
+【前提】先确保 Ollama 在后台运行
+  ollama serve
+
+
+─────────────────────────────────────────────────────
+  单文档处理 (run)
+─────────────────────────────────────────────────────
+
+# PDF 文件
+python -X utf8 main.py run 报告.pdf -f title=文档标题 -f author=作者 -f date=发布日期 -f summary=摘要
+
+# TXT / MD 文件
+python -X utf8 main.py run 文章.txt -f title=标题 -f content=正文内容
+
+# 网页 URL
+python -X utf8 main.py run https://example.com/article -f title=标题 -f summary=摘要
+
+# 显示 LLM 原始输出（调试用）
+python -X utf8 main.py run 报告.pdf -f title=标题 --raw
+
+
+─────────────────────────────────────────────────────
+  批量处理 (batch)
+─────────────────────────────────────────────────────
+
+# 处理文件夹内所有 PDF
+python -X utf8 main.py batch ./docs -f title=标题 -f summary=摘要
+
+# 处理指定后缀（多个用逗号）
+python -X utf8 main.py batch ./docs --ext pdf,txt,md -f title=标题 -f author=作者
+
+# 处理当前文件夹
+python -X utf8 main.py batch . --ext txt -f title=标题 -f summary=摘要
+
+
+─────────────────────────────────────────────────────
+  字段格式说明
+─────────────────────────────────────────────────────
+
+  -f 字段名=描述              普通字段（字符串）
+  -f 字段名=描述:required     必填字段（缺失会扣分）
+  -f 字段名=描述:list         列表字段（提取多个值）
+  -f 字段名=描述:required:list  必填 + 列表
+
+  示例：
+    -f title=文档标题:required
+    -f authors=作者列表:list
+    -f keywords=关键词:required:list
+    -f email=联系邮箱
+    -f phone=联系电话
+    -f company=所属公司
+    -f date=发布日期
+    -f amount=金额
+    -f summary=摘要
+
+
+─────────────────────────────────────────────────────
+  复审功能 (review) — 可插拔，随时运行
+─────────────────────────────────────────────────────
+
+# 复审 output/ 下所有已提取的数据（最常用）
+python -X utf8 main.py review
+
+# 复审某一个特定文件
+python -X utf8 main.py review output/abc123.json
+
+# 复审多个指定文件
+python -X utf8 main.py review output/a.json output/b.json
+
+# 复审批处理结果
+python -X utf8 main.py review output/batch_results.json
+
+# 复审完毕后打开 Excel 查看"复审报告" Sheet
+#   绿色 = 正常  红色 = 空值缺失  黄色 = 格式可疑
+
+# 可自动校验的字段类型（根据字段名关键词判断）：
+#   邮箱：字段名含 email / mail / 邮箱
+#   电话：字段名含 phone / tel / mobile / 电话 / 手机
+#   日期：字段名含 date / time / 日期 / 时间
+#   金额：字段名含 amount / price / money / fee / 金额 / 价格
+#   其他字段：只检查是否为空
+
+
+─────────────────────────────────────────────────────
+  常用场景模板
+─────────────────────────────────────────────────────
+
+# 合同/协议
+python -X utf8 main.py run 合同.pdf -f party_a=甲方名称:required -f party_b=乙方名称:required -f amount=合同金额 -f start_date=合同开始日期 -f end_date=合同结束日期
+
+# 简历
+python -X utf8 main.py run 简历.pdf -f name=姓名:required -f email=邮箱 -f phone=电话 -f education=最高学历 -f skills=技能列表:list -f experience=工作经历
+
+# 研究论文
+python -X utf8 main.py run 论文.pdf -f title=论文标题:required -f authors=作者列表:list -f abstract=摘要 -f keywords=关键词:list -f conclusions=主要结论
+
+# 新闻/文章
+python -X utf8 main.py run 新闻.txt -f title=标题:required -f date=发布日期 -f source=来源媒体 -f summary=核心内容摘要
+
+# 发票/收据
+python -X utf8 main.py run 发票.pdf -f invoice_no=发票号码:required -f date=开票日期:required -f seller=销售方 -f buyer=购买方 -f amount=金额:required -f items=商品明细:list
+
+
+─────────────────────────────────────────────────────
+  输出文件位置
+─────────────────────────────────────────────────────
+
+  output/results.xlsx       ← Excel 汇总表（含数据 Sheet + 复审报告 Sheet）
+  output/<job_id>.json      ← 单次运行的 JSON 结果
+  output/batch_results.json ← 批处理 JSON 汇总
+
+  Excel 分 Sheet 规则：字段组合相同的文档在同一个 Sheet。
+  例如提取"姓名+邮箱"的文档全在 "email+name" Sheet 里。
+
+
+─────────────────────────────────────────────────────
+  修改模型配置
+─────────────────────────────────────────────────────
+
+  编辑 .env 文件，修改 PRIMARY_MODEL 为你想用的模型名。
+  模型名可以用 ollama list 查看。
+
+  示例：
+    PRIMARY_MODEL=qwen2.5:7b
+    FALLBACK_MODELS=llama3.1:8b
+    LLM_TIMEOUT=120
+
+=====================================================

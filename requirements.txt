@@ -1,0 +1,21 @@
+# 文档解析
+pymupdf>=1.24.0          # PDF 解析（速度快、准确）
+trafilatura>=1.6.0       # 网页正文提取（自动去广告/导航栏）
+
+# LLM
+anthropic>=0.30.0        # Claude API（主模型）
+openai>=1.30.0           # OpenAI API（降级备用）
+
+# 数据校验
+pydantic>=2.0.0          # Schema 定义 + 自动校验
+
+# 缓存
+diskcache>=5.6.0         # 基于磁盘的 KV 缓存（无需 Redis）
+
+# 工具
+python-dotenv>=1.0.0     # 读取 .env 配置文件
+rich>=13.0.0             # 好看的终端输出
+click>=8.1.0             # CLI 命令行工具
+
+# Excel 导出
+openpyxl>=3.1.0          # 读写 .xlsx 文件（追加模式、样式、冻结行）
