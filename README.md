@@ -45,18 +45,14 @@ python main.py run https://example.com/article -f title=标题 -f summary=摘要
 
 ## 项目结构
 
-​```
-doc-etl/
-├── parsers/        # 解析层:PDF / 网页 / 文本
-├── extractor/      # 抽取层:Prompt 构造 + LLM 降级 + JSON 修复
-├── cache/          # 缓存层:双哈希键 + diskcache
-├── queue_worker/   # 队列层:ThreadPoolExecutor 异步并发
-├── evaluator/      # 评估层:规则打分 + 质量报告
-├── reviewer/       # 跨文档审计:字段完整性 + 格式校验
-├── exporter/       # 导出层:Excel 自动分 Sheet 追加
-└── main.py         # CLI 入口
-​```
-
+- **parsers/** — 解析层:PDF / 网页 / 文本
+- **extractor/** — 抽取层:Prompt 构造 + LLM 降级 + JSON 修复状态机
+- **cache/** — 缓存层:双哈希键 + diskcache
+- **queue_worker/** — 队列层:ThreadPoolExecutor 异步并发
+- **evaluator/** — 评估层:规则打分 + 质量报告
+- **reviewer/** — 跨文档审计:字段完整性 + 格式校验
+- **exporter/** — 导出层:Excel 自动分 Sheet 追加
+- **main.py** — CLI 入口
 ## 关键设计决策
 
 ### 为什么用 ThreadPoolExecutor,不用 Celery?
